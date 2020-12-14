@@ -1,0 +1,220 @@
+---
+title: "Exploratory Data Analysis - Forest Fires and Twitter dataset"
+author: "Hanoz Patel"
+date: "1/26/2020"
+
+---
+
+```{r}
+#A)
+#Plots on one graph 
+A <- read.csv("forestfires(1).csv")
+opar<- par(no.readonly = T)
+par(mfrow=c(2,2))
+plot(x= A$temp, y= A$area, pch= 19, main="Area VS Temperature",
+     ylab ="Area", xlab="Temperature",col.main="Navy blue")
+
+plot(x= A$month, y= A$area, pch= 19, main="Area VS Month",
+     ylab= "Area", xlab="Month",col.main="Navy blue")
+
+plot(x= A$temp, y= A$DC,  main="Area VS DC",
+     ylab= "Area", xlab="DC", col.main="Navy Blue")
+
+plot(x= A$RH, y= A$DC, main="Area VS RH",
+     ylab= "Area", xlab="RH", col.main="blue")
+```
+
+
+
+```{r}
+#B)
+#histogram of wind speed 
+par(opar)
+hist(A$wind,xlab="Wind Speed",main="Histogram of Wind Speed", col="gray")
+```
+
+
+
+```{r}
+#C)
+#Summary 
+summary(A$wind)
+```
+
+```{r}
+#D)
+#Desity line
+hist(A$wind,xlab="Wind Speed",main="Histogram of Wind Speed",col="gray", freq=FALSE)
+lines(density(A$wind),lwd=1)
+```
+
+
+
+```{r}
+#E)
+# wind speed density of all months
+library (ggplot2)
+ggplot(data=A, aes(x=wind, group= month, fill = month))+geom_density(position ="stack")
+```
+
+```{r}
+#F)
+#Scatter matrix
+pairs(~temp+RH+DC+DMC,data=A)
+```
+
+
+```{r}
+#Correlation
+#parameters with Strong positive correlation :DC-DMC
+#parameters with week positive correlation   :Temp-DMC, Temp-DC
+#parameters with negative correlation        :Temp-RH
+#parameters with no-correlation              :RH-DC, RH-DMC
+```
+
+```{r}
+#G)
+#boxplopt 
+par(mfrow=c(1,3))
+boxplot(A$wind,ylab="Wind",main="Boxplot of Wind")
+boxplot(A$ISI,ylab="ISI",main="Boxplot of ISI")
+boxplot(A$DC,ylab="DC",main="Boxplot of DC")
+```
+
+```{r}
+#Anomalies/outliers
+
+#There are outliers in all the 3 box-plots .
+#Windspeed and ISI has outliers above upper limit.
+#DC has outlier below lower limit.
+```
+
+
+```{r}
+#H)
+
+#Histogram of DMC and log of DMC
+par(mfrow=c(1,2))
+hist(A$DMC,xlab="DMC",main="Histogram of DMC")
+hist(log(A$DMC),xlab="log of DMC",main="Histogram of log of DMC")
+```
+
+```{r}
+#Spread of DMC histogram is right-skewed 
+#on the otherhand  spread of log(DMC) histogram is left-skewed.
+```
+
+```{r}
+#problem 2 (Tweeter Accounts)
+#part a
+twitteracc <- read.csv('M01_quasi_twitter(1).csv')
+#pass command to read csv file
+par(mfrow=c(1,2))
+
+
+library(ggplot2)
+hist(twitteracc$friends_count,breaks = 5, freq = FALSE, main = 'Histogram of friends_count')
+lines(density(twitteracc$friends_count))
+boxplot(twitteracc$friends_count, main="Boxplot of friends_count")
+```
+
+```{r}
+#part_b
+summary(twitteracc$friends_count)
+```
+
+
+```{r}
+#part_c
+#Data has negative values, according to summary(). Friends_count cannot be negative. Median is 324 and mean is 1058 which indicates that the data is spread in an uneven manner. It can be observes in the graph that data is concentrated in one section and has some outliers.
+```
+
+```{r}
+#part_d
+
+library(scatterplot3d)
+attach(twitteracc)
+scatter3dplt <- scatterplot3d(x=created_at_year, y = education, z = age, pch = 5, highlight.3d=TRUE,type='h',main='3-D Scatter Plot')
+fitting <- lm(age~created_at_year+education)
+scatter3dplt$plane3d(fitting)
+```
+
+
+```{r}
+ #part_e
+opar<-par(no.readonly=TRUE)
+par(mfrow=c(1,2))
+accs <- c(650,1000,900,300,14900)
+lbl <- c("UK","Canada","India","Australia","US")
+pct<-round(accs/sum(accs)*100)
+lbling <- paste(lbl," ",pct,"%", sep="")
+pie(accs,labels=lbling,col=rainbow(length(lbling)),main="Pie Chart (with %)")
+
+library(plotrix)
+pie3D(accs, labels = lbling, explode = 0.4, main = '3-D Pie Chart')
+ 
+par(opar)
+```
+
+```{r}
+#part_f
+par(mfrow=c(1,1))
+d <- density(twitteracc$created_at_year) #density data
+plot(d, main='Kernel Density of created_at_year')
+polygon(d, col='lightblue', border='red')
+```
+
+```{r}
+#The Kernel Density plot indicates relative probability. Density=0.27 in 2009, which is high, and then decrease between 0.15-0.20 from 2010 to 2013 and increased again in 2013 to 0.25.
+```
+
+```{r}
+#problem_3
+#part_a 
+ 
+raw_data <- read.csv('raw_data(1).csv')
+Ndata<- scale(raw_data,center=TRUE,scale=TRUE)
+```
+
+```{r}
+#part_b
+ 
+opar<-par(no.readonly = TRUE)
+par(mfrow=c(1,4))
+boxplot(raw_data$A,main="Boxplot of A")
+boxplot(raw_data$B,main="Boxplot of B")
+boxplot(raw_data$C,main="Boxplot of C")
+boxplot(raw_data$D,main="Boxplot of D")
+
+par(opar)
+```
+
+```{r}
+#part_c
+par(mfrow=c(1,4))
+boxplot(Ndata[,1],main="Boxplot of A")
+boxplot(Ndata[,2],main="Boxplot of B")
+boxplot(Ndata[,3],main="Boxplot of C")
+boxplot(Ndata[,4],main="Boxplot of D")
+ 
+par(opar)
+```
+
+
+```{r}
+#part_d
+#Standardization makes raw data behave the same way even after standardization. Thus, the spread of box plot is the same in part b and part c and all the variables are measured on the same scale. Therefore, A, B, C, and D can be compared side by side easily on the same scale
+```
+
+```{r}
+#part_e
+ 
+library(ggplot2)
+ 
+ggplot(raw_data, aes(x=A,y=B)) + geom_point(shape = 19, color = 'darkred', alpha = 0.7) + ggtitle('Scatterplot of A v/s B') + geom_smooth()
+```
+
+
+```{r}
+#From the scatter plot, we note that correlation between A and B is very poor. No correlation trend can be found
+```
